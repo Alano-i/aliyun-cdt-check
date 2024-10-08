@@ -56,7 +56,7 @@ class DailyTrafficNotification
                 }
 
                 // 准备通知内容
-                $message = "账号名称: {$account['accountName']}\n";
+                $message = "服务器: {$account['accountName']}\n";
                 $message .= "实例ID: {$account['instanceId']}\n";
                 $message .= "实例IP: {$instanceDetails['公网IP地址']}\n";
                 $message .= "到期时间: {$instanceDetails['到期时间']}\n";
@@ -318,6 +318,12 @@ class DailyTrafficNotification
             $results['tg'] = $this->sendTGNotification($message, $emailConfig['tgBotToken'], $emailConfig['tgChatId']);
         }
 
+        // 发送 Webhook 通知
+        if ($emailConfig['enableWebhook']) {
+            $results['webhook'] = $this->sendWebhookNotification($message, $emailConfig['webhookUrl'], $emailConfig['title'],$emailConfig['webhookId']);
+        }
+
+
         // 检查是否所有通知都成功
         foreach ($results as $result) {
             if ($result !== true) {
@@ -329,6 +335,15 @@ class DailyTrafficNotification
         echo "通知发送成功" . PHP_EOL;
         return true;
     }
+
+    
+    private function sendWebhookNotification($message, $webhookUrl,$title,$id)
+    {
+        $fullWebhookUrl = "{$webhookUrl}&id={$id}&title=" . rawurlencode($title) . "&content=" . urlencode($message);
+        $result = file_get_contents($fullWebhookUrl);
+        return $result !== false;
+    }
+
 
     private function sendBarkNotification($message, $barkUrl)
     {

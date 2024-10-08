@@ -1,9 +1,7 @@
-version: '3'
-
 services:
-  check:
-    container_name: aliyun-cdt-check 
-    image: aliyun-cdt-check  
+  aliyun-cdt-check:
+    container_name: aliyun-cdt-check
+    image: alanoo/aliyun-cdt-check
     volumes:
-      - ./config.php:/app/config.php 
+      - /appdata/aliyun-cdt-check/config.php:/app/config.php
     restart: always

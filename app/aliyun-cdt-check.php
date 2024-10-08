@@ -243,7 +243,7 @@ private function validateCredentialsAndInstance($account)
     } catch (ClientException $e) {
         // 捕获客户端异常 (如 AK、SK 错误)
         $log = [
-            '账号名称' => $account['accountName'],
+            '服务器' => $account['accountName'],
             '错误信息' => '客户端异常: ' . $e->getErrorMessage()
         ];
 
@@ -257,7 +257,7 @@ private function validateCredentialsAndInstance($account)
         // 捕获服务器异常 (如 `InstanceId` 错误)
         $log = [
             '实例ID' => $account['instanceId'],
-            '账号名称' => $account['accountName'],
+            '服务器' => $account['accountName'],
             '错误信息' => '服务器异常: ' . $e->getErrorMessage()
         ];
 
@@ -270,7 +270,7 @@ private function validateCredentialsAndInstance($account)
     } catch (Exception $e) {
         // 捕获所有其他类型的异常
         $log = [
-            '账号名称' => $account['accountName'],
+            '服务器' => $account['accountName'],
             '实例ID' => $account['instanceId'],
             '错误信息' => '未知错误: ' . $e->getMessage()
         ];
@@ -321,8 +321,6 @@ private function getInstanceDetails($accessKeyId, $accessKeySecret, $instanceId,
                 $publicIpAddress = $instance['EipAddress']['IpAddress'];
             }
 
-            
-
             // 返回所有获取到的信息
             return [
                 '到期时间' => $expirationTime,
@@ -350,8 +348,6 @@ private function getInstanceDetails($accessKeyId, $accessKeySecret, $instanceId,
 }
 
 
-
-
 public function check()
 {
     $logs = [];
@@ -377,7 +373,7 @@ public function check()
             // 记录日志信息
             $log = [
                 '实例ID' => $account['instanceId'],
-                '账号名称' => $accountName,
+                '服务器' => $accountName,
                 '总流量' => $account['maxTraffic'] . 'GB',
                 '已使用流量' => $traffic . 'GB',
                 '使用百分比' => $usagePercentage . '%',
@@ -426,7 +422,7 @@ public function check()
             // 处理客户端异常（例如 AccessKey 不正确）
             echo '客户端异常: ' . $e->getErrorMessage() . PHP_EOL;  // 输出到控制台
             $log = [
-                '账号名称' => $accountName,
+                '服务器' => $accountName,
                 '错误信息' => '客户端异常: ' . $e->getErrorMessage()
             ];
             $this->sendNotification($log);  // 发送错误通知
@@ -435,7 +431,7 @@ public function check()
             echo '服务器异常: ' . $e->getErrorMessage() . PHP_EOL;  // 输出到控制台
             $log = [
                 '实例ID' => $account['instanceId'],
-                '账号名称' => $accountName,
+                '服务器' => $accountName,
                 '错误信息' => '服务器异常: ' . $e->getErrorMessage()
             ];
             $this->sendNotification($log);  // 发送错误通知
@@ -445,18 +441,6 @@ public function check()
     // 写入日志信息到文件并输出到浏览器
     $this->writeLog($logs);
 }
-
-
-
-
-
-
-
-
-
-
-       
-    
 
     private function writeLog($logs)
     {
@@ -475,11 +459,6 @@ public function check()
     }
 
 
-
-
-
-
-
     private function sendNotification($log)
     {
         $config = include 'config.php';
@@ -489,14 +468,14 @@ public function check()
         if (isset($log['错误信息'])) {
             // 如果有错误信息，发送错误通知
             $message = "⚠️ 错误通知\n";
-            $message .= "账号名称: {$log['账号名称']}\n";
+            $message .= "服务器: {$log['服务器']}\n";
             $message .= "错误信息: {$log['错误信息']}\n";
             if (isset($log['实例ID'])) {
                 $message .= "实例ID: {$log['实例ID']}\n";
             }
         } else {
             // 正常的通知内容，按照指定顺序
-            $message = "账号名称: {$log['账号名称']}\n";
+            $message = "服务器: {$log['服务器']}\n";
             $message .= "实例ID: {$log['实例ID']}\n";
             $message .= "实例IP: {$log['公网IP地址']}\n";
             $message .= "到期时间: {$log['实例到期时间']}\n";
@@ -532,6 +511,11 @@ public function check()
             $results['tg'] = $this->sendTGNotification($message, $emailConfig['tgBotToken'], $emailConfig['tgChatId']);
         }
     
+        // 发送 Webhook 通知
+        if ($emailConfig['enableWebhook']) {
+            $results['webhook'] = $this->sendWebhookNotification($message, $emailConfig['webhookUrl'], $emailConfig['title'],$emailConfig['webhookId']);
+        }
+    
         // 检查是否所有通知都成功
         foreach ($results as $result) {
             if ($result !== true) {
@@ -541,25 +525,15 @@ public function check()
     
         return true;
     }
-    
-    
 
     
+    private function sendWebhookNotification($message, $webhookUrl,$title,$id)
+    {
+        $fullWebhookUrl = "{$webhookUrl}&id={$id}&title=" . rawurlencode($title) . "&content=" . urlencode($message);
+        $result = file_get_contents($fullWebhookUrl);
+        return $result !== false;
+    }
     
-    
-
-    
-
-
-
-
-
-
-
-
-
-    
-
     private function sendBarkNotification($message, $barkUrl)
     {
         // 将消息追加到用户自定义的 Bark URL
