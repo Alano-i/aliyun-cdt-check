@@ -61,7 +61,7 @@ class DailyTrafficNotification
                 $message .= "实例IP: {$instanceDetails['公网IP地址']}\n";
                 $message .= "到期时间: {$instanceDetails['到期时间']}\n";
                 $message .= "CDT总流量: {$account['maxTraffic']}GB\n";
-                $message .= "已使用流量: {$traffic}GB\n";
+                $message .= "已使用流量: " . round($traffic, 2) . "GB\n";
                 $message .= "使用百分比: {$usagePercentage}%\n";
                 $message .= "地区: {$this->getRegionName($account['regionId'])}\n";
                 $message .= "安全组状态: 启用\n";

@@ -375,7 +375,7 @@ public function check()
                 '实例ID' => $account['instanceId'],
                 '服务器' => $accountName,
                 '总流量' => $account['maxTraffic'] . 'GB',
-                '已使用流量' => $traffic . 'GB',
+                '已使用流量' => round($traffic, 2) . 'GB',
                 '使用百分比' => $usagePercentage . '%',
                 '地区' => $regionName,
                 '实例到期时间' => $instanceDetails['到期时间'],
