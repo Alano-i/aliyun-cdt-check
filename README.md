@@ -30,14 +30,22 @@ config.php配置如下，按需修改
 return [
     'Accounts' => [
         [
-            'accountName' => 'xxxx',
-            'AccessKeyId' => '***',
-            'AccessKeySecret' => '***',
-            'regionId' => 'cn-hongkong',
-            'instanceId' => 'i-***',
-            'maxTraffic' => 0.01 // 设置流量限制
+            'accountName' => 'xxxx',         // 随意填，用于区分每个服务器
+            'AccessKeyId' => '***',          // 阿里云 AccessKeyId
+            'AccessKeySecret' => '***',      // 阿里云 AccessKeySecret
+            'regionId' => 'cn-hongkong',     // 阿里云 regionId, cityId 请参考 https://help.aliyun.com/document_detail/40654.html
+            'instanceId' => 'i-***',         // 阿里云实例ID, https://ecs.console.aliyun.com/server/region/cn-hongkong?accounttraceid#/ 查看
+            'maxTraffic' => 180              // 设置流量限制，单位为G
         ]
-		//可多个配置
+        // [
+        //     'accountName' => 'xxxx',
+        //     'AccessKeyId' => 'AK',
+        //     'AccessKeySecret' => 'AS',
+        //     'regionId' => 'cn-hongkong',
+        //     'instanceId' => 'i-j6cj3uXXX',
+        //     'maxTraffic' => 200 // 设置流量限制
+        // ]
+		//可配置多个账户（每个数组直接用,分割），不用请删掉。
     ],
     'Notification' => [
 
