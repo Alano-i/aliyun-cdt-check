@@ -38,6 +38,14 @@ return [
         'webhookId' => '1',               // 通知通道id，按需配置，没有则无需修改
         'webhookUrl' => 'https://mr.xxxx/api/plugins/notifyapi/send_notify?&access_key=xxxxxxx', 
 
+        'enableQywx' => false,    // 企业微信 通知开关
+        'touser' => 'xxx',        // 企业微信通知用户
+        'corpid' => 'xxx',        // 企业微信企业ID
+        'corpsecret' => 'xxx',    // 企业微信应用Secret
+        'agentid' => 'xxx',       // 企业微信应用AgentId
+        'picUrl' => 'xxx',        // 企业微信应用封面
+        'baseApiUrl' => 'https://qyapi.weixin.qq.com',     // 企业微信API地址，如有代理填代理地址，默认：https://qyapi.weixin.qq.com
+
 
         'enableTG' => false,            // Telegram 通知开关
         'tgBotToken' => 'your-telegram-bot-token',

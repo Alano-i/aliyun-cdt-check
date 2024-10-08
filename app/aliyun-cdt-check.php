@@ -515,6 +515,11 @@ public function check()
         if ($emailConfig['enableWebhook']) {
             $results['webhook'] = $this->sendWebhookNotification($message, $emailConfig['webhookUrl'], $emailConfig['title'],$emailConfig['webhookId']);
         }
+
+        // 发送 企业微信 通知
+        if ($emailConfig['enableQywx']) {
+            $results['qywx'] = $this->sendQywxNotification($message, $emailConfig['title'],$emailConfig['touser'], $emailConfig['corpid'],$emailConfig['corpsecret'],$emailConfig['agentid'],$emailConfig['baseApiUrl'],$emailConfig['picUrl']);
+        }
     
         // 检查是否所有通知都成功
         foreach ($results as $result) {
@@ -533,6 +538,65 @@ public function check()
         $result = file_get_contents($fullWebhookUrl);
         return $result !== false;
     }
+
+    // 企业微信通知
+    private function sendQywxNotification($message, $title, $touser,$corpid,$corpsecret,$agentid,$baseApiUrl,$picUrl)
+    {
+        $postdata = array(
+            'touser' => $touser,
+            'msgtype' => 'news',
+            'agentid' => $agentid,
+            'news' => array(
+                'articles' => array(
+                    array(
+                        'title' => $title,
+                        'description' => $message,
+                        'url' => '',
+                        'picurl' => $picUrl,
+                    )
+                )
+            ),
+            'enable_id_trans' => 0,
+            'enable_duplicate_check' => 0,
+            'duplicate_check_interval' => 1800
+        );
+
+        $url = "{$baseApiUrl}/cgi-bin/gettoken?corpid={$corpid}&corpsecret={$corpsecret}";
+
+        // curl 请求处理函数
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $out = curl_exec($ch);
+        curl_close($ch);
+
+        $access_token_Arr =  json_decode($out, true);
+        $access_token = $access_token_Arr['access_token'];
+
+        // 发送应用消息
+        $sendUrl = "{$baseApiUrl}/cgi-bin/message/send?access_token={$access_token}";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $sendUrl);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postdata));
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        // 将返回的 JSON 解析为数组
+        $response = json_decode($result, true);
+        // 如果返回结果中 errcode 为 0，表示操作成功，返回 true，否则返回 false
+        if ($response && $response['errcode'] === 0) {
+            return true;
+        } else {
+            return false;
+        }
+        
+    }
+
     
     private function sendBarkNotification($message, $barkUrl)
     {
