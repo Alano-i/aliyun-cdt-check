@@ -1,7 +1,8 @@
 services:
   aliyun-cdt-check:
     container_name: aliyun-cdt-check
-    image: alanoo/aliyun-cdt-check
+    image: alanoo/aliyun-cdt-check:latest
+    network_mode: bridge
     volumes:
       - /appdata/aliyun-cdt-check/config.php:/app/config.php
     restart: always
