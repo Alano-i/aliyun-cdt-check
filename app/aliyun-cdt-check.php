@@ -483,7 +483,7 @@ public function check()
             $message .= "已使用流量: {$log['已使用流量']}\n";
             $message .= "使用百分比: {$log['使用百分比']}\n";
             $message .= "地区: {$log['地区']}\n";
-            $message .= "安全组状态: {$log['安全组状态']}\n";
+            $message .= "安全组状态: {$log['安全组状态']}\n";            
         }
     
         // 初始化结果数组

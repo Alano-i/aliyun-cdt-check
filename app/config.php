@@ -43,7 +43,7 @@ return [
         'corpid' => 'xxx',        // 企业微信企业ID
         'corpsecret' => 'xxx',    // 企业微信应用Secret
         'agentid' => 'xxx',       // 企业微信应用AgentId
-        'picUrl' => 'xxx',        // 企业微信应用封面
+        'picUrl' => 'xxx',        // 企业微信通知封面图
         'baseApiUrl' => 'https://qyapi.weixin.qq.com',     // 企业微信API地址，如有代理填代理地址，默认：https://qyapi.weixin.qq.com
 
 

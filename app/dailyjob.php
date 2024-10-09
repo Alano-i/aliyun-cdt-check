@@ -78,20 +78,16 @@ class DailyTrafficNotification
                 $progress_undo = str_repeat($progress_undo_text, $progress_undo_num);
                 $progress = $progress_do . $progress_undo;
 
+                $formattedDateTime = (new DateTime($instanceDetails['到期时间']))->format('Y-m-d H:i:s');
+
                 // 准备通知内容
-                // $message = "服务器: {$account['accountName']}（{$instanceDetails['公网IP地址']}）\n";
-                
-                // $message .= "实例IP: {$instanceDetails['公网IP地址']}\n";
-                $message = "{$progress} {$usagePercentage}%\n";
-                $message .= "服务器: {$account['accountName']}（{$instanceDetails['公网IP地址']}）\n";
-                
-                // $message .= "CDT总流量: {$account['maxTraffic']}GB\n";
+                $message = "{$account['accountName']}（{$instanceDetails['公网IP地址']}）\n";
+                $message .= "{$progress} {$usagePercentage}%\n";
                 $message .= "已使用流量: " . round($traffic, 2) . "GB / {$account['maxTraffic']}GB\n";
-                // $message .= "使用百分比: {$usagePercentage}%\n";
-                $message .= "实例ID: {$account['instanceId']}\n";
                 $message .= "实例地区: {$this->getRegionName($account['regionId'])}\n";
+                $message .= "到期时间: {$formattedDateTime}\n";
+                $message .= "实例ID: {$account['instanceId']}\n";
                 $message .= "安全组状态: 启用\n";
-                $message .= "到期时间: {$instanceDetails['到期时间']}\n";
 
                 $traffic = round($traffic, 2)."GB";
                 
@@ -349,7 +345,7 @@ class DailyTrafficNotification
 
         // 发送 Webhook 通知
         if ($emailConfig['enableWebhook']) {
-            $results['webhook'] = $this->sendWebhookNotification($message, $emailConfig['webhookUrl'], $emailConfig['title'],$emailConfig['webhookId']);
+            $results['webhook'] = $this->sendWebhookNotification($message, $emailConfig['webhookUrl'], $emailConfig['title'],$emailConfig['webhookId'],$traffic);
         }
 
         // 发送 企业微信 通知
@@ -371,8 +367,9 @@ class DailyTrafficNotification
     }
 
     
-    private function sendWebhookNotification($message, $webhookUrl,$title,$id)
+    private function sendWebhookNotification($message, $webhookUrl,$title,$id,$traffic)
     {
+        $title = "已使用{$traffic} - {$title}";
         $fullWebhookUrl = "{$webhookUrl}&id={$id}&title=" . rawurlencode($title) . "&content=" . urlencode($message);
         $result = file_get_contents($fullWebhookUrl);
         return $result !== false;
