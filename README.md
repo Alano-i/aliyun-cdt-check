@@ -62,16 +62,16 @@ return [
         'enableBark' => false,          // Bark 通知开关
         'barkUrl' => 'https://api.day.app/XXXXXXXX', 
 
-        'enableWebhook' => true,          // webhook 通知开关
+        'enableWebhook' => false,          // webhook 通知开关
         'webhookId' => '1',               // 通知通道id，按需配置，没有则无需修改
         'webhookUrl' => 'https://mr.xxxx/api/plugins/notifyapi/send_notify?&access_key=xxxxxxx', 
 
-        'enableQywx' => false,    // 企业微信 通知开关
-        'touser' => 'xxx',        // 企业微信通知用户
-        'corpid' => 'xxx',        // 企业微信企业ID
-        'corpsecret' => 'xxx',    // 企业微信应用Secret
-        'agentid' => 'xxx',       // 企业微信应用AgentId
-        'picUrl' => 'xxx',        // 企业微信应用封面
+        'enableQywx' => true,        // 企业微信 通知开关
+        'touser' => '@all',           // 企业微信通知用户
+        'corpid' => 'xxx',            // 企业微信企业ID
+        'corpsecret' => 'xxx',        // 企业微信应用Secret
+        'agentid' => '1000002',       // 企业微信应用AgentId
+        'picUrl' => 'https://raw.githubusercontent.com/Alano-i/aliyun-cdt-check/refs/heads/main/aliyuncdt.png',        // 企业微信通知封面图
         'baseApiUrl' => 'https://qyapi.weixin.qq.com',     // 企业微信API地址，如有代理填代理地址，默认：https://qyapi.weixin.qq.com
 
 
