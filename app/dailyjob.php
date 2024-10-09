@@ -54,20 +54,49 @@ class DailyTrafficNotification
                 if (!$isEnabled) {
                     continue; // 如果安全组已禁用，不发送通知
                 }
+                // $usagePercentage =0.45;
+
+                // 进度条
+                $progress = round($usagePercentage, 0);
+                $progress_all_num = 20;
+                // 黑白进度条
+                $progress_do_text = "■";
+                $progress_undo_text = "□";
+
+                $progress_do_num = min($progress_all_num, round(0.5 + (($progress_all_num * intval($progress)) / 100)));
+
+                // 处理96%-100%进度时进度条展示，正常计算时，进度大于等于96%就已是满条，需单独处理
+                if (95 < intval($progress) && intval($progress) < 100) {
+                    $progress_do_num = $progress_all_num - 1;
+                }
+
+                // 计算未完成部分
+                $progress_undo_num = $progress_all_num - $progress_do_num;
+
+                // 生成黑白进度条
+                $progress_do = str_repeat($progress_do_text, $progress_do_num);
+                $progress_undo = str_repeat($progress_undo_text, $progress_undo_num);
+                $progress = $progress_do . $progress_undo;
 
                 // 准备通知内容
-                $message = "服务器: {$account['accountName']}\n";
+                // $message = "服务器: {$account['accountName']}（{$instanceDetails['公网IP地址']}）\n";
+                
+                // $message .= "实例IP: {$instanceDetails['公网IP地址']}\n";
+                $message = "{$progress} {$usagePercentage}%\n";
+                $message .= "服务器: {$account['accountName']}（{$instanceDetails['公网IP地址']}）\n";
+                
+                // $message .= "CDT总流量: {$account['maxTraffic']}GB\n";
+                $message .= "已使用流量: " . round($traffic, 2) . "GB / {$account['maxTraffic']}GB\n";
+                // $message .= "使用百分比: {$usagePercentage}%\n";
                 $message .= "实例ID: {$account['instanceId']}\n";
-                $message .= "实例IP: {$instanceDetails['公网IP地址']}\n";
-                $message .= "到期时间: {$instanceDetails['到期时间']}\n";
-                $message .= "CDT总流量: {$account['maxTraffic']}GB\n";
-                $message .= "已使用流量: " . round($traffic, 2) . "GB\n";
-                $message .= "使用百分比: {$usagePercentage}%\n";
-                $message .= "地区: {$this->getRegionName($account['regionId'])}\n";
+                $message .= "实例地区: {$this->getRegionName($account['regionId'])}\n";
                 $message .= "安全组状态: 启用\n";
+                $message .= "到期时间: {$instanceDetails['到期时间']}\n";
 
+                $traffic = round($traffic, 2)."GB";
+                
                 // 发送通知
-                $this->sendNotification($message);
+                $this->sendNotification($message,$traffic);
             } catch (ClientException $e) {
                 echo '客户端异常: ' . $e->getErrorMessage() . PHP_EOL;
             } catch (ServerException $e) {
@@ -288,7 +317,7 @@ class DailyTrafficNotification
         return false;
     }
 
-    private function sendNotification($message)
+    private function sendNotification($message,$traffic)
     {
         $config = include 'config.php';
         $emailConfig = $config['Notification'];
@@ -325,7 +354,7 @@ class DailyTrafficNotification
 
         // 发送 企业微信 通知
         if ($emailConfig['enableQywx']) {
-            $results['qywx'] = $this->sendQywxNotification($message, $emailConfig['title'],$emailConfig['touser'], $emailConfig['corpid'],$emailConfig['corpsecret'],$emailConfig['agentid'],$emailConfig['baseApiUrl'],$emailConfig['picUrl']);
+            $results['qywx'] = $this->sendQywxNotification($message, $emailConfig['title'],$emailConfig['touser'], $emailConfig['corpid'],$emailConfig['corpsecret'],$emailConfig['agentid'],$emailConfig['baseApiUrl'],$emailConfig['picUrl'],$traffic);
         }
 
 
@@ -351,8 +380,9 @@ class DailyTrafficNotification
 
 
     // 企业微信通知
-    private function sendQywxNotification($message, $title, $touser,$corpid,$corpsecret,$agentid,$baseApiUrl,$picUrl)
+    private function sendQywxNotification($message, $title, $touser,$corpid,$corpsecret,$agentid,$baseApiUrl,$picUrl,$traffic)
     {
+        $title = "已使用{$traffic} - {$title}";
         $postdata = array(
             'touser' => $touser,
             'msgtype' => 'news',
