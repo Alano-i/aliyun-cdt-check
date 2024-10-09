@@ -10,7 +10,11 @@
 - 如果非要在断网之后ssh连接小鸡等操作，请手动添加指定端口的规则组，因为全部端口的规则组会被自动删除掉，指定端口的规则不受影响
 
 ## 通知效果
-<img width="495" alt="image" src="https://github.com/user-attachments/assets/74bbc48e-5cc6-4f2c-81d7-8d94fa282956">
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/d8f5f590-e9a3-44ae-90e3-a4a4de938ab5">
+
+
+
+
 
 
 ## 部署
